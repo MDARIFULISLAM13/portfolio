@@ -26,12 +26,12 @@
     ["Facebook", "arif341a", "https://www.facebook.com/arif341a/"],
   ];
   const contests = [
-    ["DUET Inter University Programming Contest", "2025", "Rank 9th"],
-    ["Uttara University Inter-University Programming Contest", "2025", "Rank 6th"],
-    ["NDUB Inter University Programming Contest", "2026", "Rank 12th"],
-    ["DUET Inter University Programming Contest", "2026", "Rank 5th"],
-    ["SUST Inter University Programming Contest", "2026", "Rank 15th"],
-    ["UT 12th ICT Fest Inter University Programming Contest", "2026", "Rank 8th"],
+    ["DUET Inter University Programming Contest", "2025", "To be updated"],
+    ["Uttara University Inter-University Programming Contest", "2025", "To be updated"],
+    ["NDUB Inter University Programming Contest", "2026", "To be updated"],
+    ["DUET Inter University Programming Contest", "2026", "To be updated"],
+    ["SUST Inter University Programming Contest", "2026", "To be updated"],
+    ["UT 12th ICT Fest Inter University Programming Contest", "2026", "To be updated"],
   ];
 
   function renderProjects() {
@@ -75,63 +75,15 @@
         elements.push(element);
       }
     });
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("revealed");
-        observer.unobserve(entry.target);
-      });
-    }, { threshold:.12, rootMargin:"0px 0px -8%" });
+    const observer = new IntersectionObserver((entries) => { entries.forEach((entry) => entry.target.classList.toggle("revealed", entry.isIntersecting)); }, { threshold:.12, rootMargin:"0px 0px -8%" });
     elements.forEach((element) => observer.observe(element));
   }
   function initNavigation() {
-    const header = $("[data-header]"), button = $(".menu-button"), menu = $("#mobile-menu"), progress = $("#scroll-progress");
-    let ticking = false;
-    const onScroll = () => {
-      header.classList.toggle("scrolled", scrollY > 50);
-      if (progress) {
-        const max = document.documentElement.scrollHeight - innerHeight;
-        progress.style.transform = `scaleX(${max > 0 ? Math.min(scrollY / max, 1) : 0})`;
-      }
-      ticking = false;
-    };
-    window.addEventListener("scroll", () => { if (!ticking) { requestAnimationFrame(onScroll); ticking = true; } }, { passive:true });
-    onScroll();
+    const header = $("[data-header]"), button = $(".menu-button"), menu = $("#mobile-menu");
+    window.addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 50), { passive:true });
     button.addEventListener("click", () => { const open = menu.hidden; menu.hidden = !open; button.setAttribute("aria-expanded", open); });
     $$("a", menu).forEach((link) => link.addEventListener("click", () => { menu.hidden = true; button.setAttribute("aria-expanded", "false"); }));
     document.addEventListener("keydown", (event) => { if (event.key === "Escape") { menu.hidden = true; button.setAttribute("aria-expanded", "false"); closeModal(); } });
-  }
-  function initScrollSpy() {
-    const links = $$('.desktop-nav a[href^="#"]');
-    if (!links.length) return;
-    const sections = links.map((link) => $(link.getAttribute("href"))).filter(Boolean);
-    const setActive = (id) => links.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${id}`));
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => { if (entry.isIntersecting) setActive(entry.target.id); });
-    }, { rootMargin:"-45% 0px -50% 0px", threshold:0 });
-    sections.forEach((section) => observer.observe(section));
-  }
-  function initMagnetic() {
-    if (matchMedia("(hover:none),(prefers-reduced-motion:reduce)").matches) return;
-    $$(".button,.nav-cta").forEach((element) => {
-      element.addEventListener("mousemove", (event) => {
-        const rect = element.getBoundingClientRect();
-        const x = event.clientX - rect.left - rect.width / 2, y = event.clientY - rect.top - rect.height / 2;
-        element.style.transform = `translate(${x * .18}px, ${y * .35}px)`;
-      });
-      element.addEventListener("mouseleave", () => { element.style.transform = ""; });
-    });
-  }
-  function initSpotlight() {
-    if (matchMedia("(hover:none)").matches) return;
-    const selector = ".project-card,.skill-card,.feature-grid article,.skill-groups article,.profile-card,.skill-filter";
-    document.addEventListener("pointermove", (event) => {
-      const target = event.target.closest(selector);
-      if (!target) return;
-      const rect = target.getBoundingClientRect();
-      target.style.setProperty("--x", `${event.clientX - rect.left}px`);
-      target.style.setProperty("--y", `${event.clientY - rect.top}px`);
-    });
   }
   function initSmoothLinks() {
     $$('a[href^="#"]').forEach((link) => link.addEventListener("click", (event) => {
@@ -153,6 +105,6 @@
     $$(".project-card").forEach((card) => { card.addEventListener("mouseenter", () => card.classList.add("hovered")); card.addEventListener("mouseleave", () => card.classList.remove("hovered")); $("button", card).addEventListener("click", () => openModal(Number(card.dataset.project))); });
     $("#contact-form").addEventListener("submit", async (event) => { event.preventDefault(); const form = event.currentTarget, status = $("#form-status"), button = $("button", form); if (!form.reportValidity()) return; button.disabled = true; button.textContent = "Sending…"; try { const response = await fetch("https://formspree.io/f/xpwzljwd", { method:"POST", headers:{Accept:"json"}, body:new FormData(form) }); if (!response.ok) throw new Error(); form.reset(); status.textContent = "Message sent successfully. I will get back to you soon."; } catch { status.textContent = "Something went wrong. Please email me directly."; } finally { setTimeout(() => { button.disabled = false; button.innerHTML = "Send Message <span>↗</span>"; }, 1800); } });
   }
-  function init() { renderSkills(); renderProjects(); renderProfiles(); renderContests(); initNavigation(); initSmoothLinks(); initCounters(); initReveal(); initInteractions(); initScrollSpy(); initMagnetic(); initSpotlight(); $("[data-year]").textContent = new Date().getFullYear(); }
+  function init() { renderSkills(); renderProjects(); renderProfiles(); renderContests(); initNavigation(); initSmoothLinks(); initCounters(); initReveal(); initInteractions(); $("[data-year]").textContent = new Date().getFullYear(); }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init, { once:true }) : init();
 })();
