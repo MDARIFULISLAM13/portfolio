@@ -20524,13 +20524,13 @@ const A1 = [
                     children: y.jsx("span", {
                       className: "text-white font-black text-[11px]",
                       "aria-hidden": "true",
-                      children: "P",
+                      children: "A",
                     }),
                   }),
                   y.jsx("span", {
                     className:
                       "text-xs font-semibold tracking-[0.25em] uppercase text-black",
-                    children: "Pritom Das",
+                    children: "Md. Ariful Islam",
                   }),
                 ],
               }),
