@@ -86,24 +86,13 @@
     document.addEventListener("keydown", (event) => { if (event.key === "Escape") { menu.hidden = true; button.setAttribute("aria-expanded", "false"); closeModal(); } });
   }
   function initSmoothLinks() {
-    let animationFrame = null;
-    const ease = (value) => value < .5 ? 4 * value * value * value : 1 - Math.pow(-2 * value + 2, 3) / 2;
-    const smoothTo = (top, duration = 900) => {
-      const startY = window.scrollY, distance = top - startY, started = performance.now();
-      cancelAnimationFrame(animationFrame);
-      const step = (now) => {
-        const progress = Math.min((now - started) / duration, 1);
-        window.scrollTo(0, startY + distance * ease(progress));
-        if (progress < 1) animationFrame = requestAnimationFrame(step);
-      };
-      animationFrame = requestAnimationFrame(step);
-    };
     $$('a[href^="#"]').forEach((link) => link.addEventListener("click", (event) => {
-      const target = $(link.getAttribute("href"));
+      const selector = link.getAttribute("href");
+      const target = selector && selector !== "#" ? $(selector) : null;
       if (!target) return;
       event.preventDefault();
-      smoothTo(target.getBoundingClientRect().top + window.scrollY, 1000);
-      history.replaceState(null, "", link.getAttribute("href"));
+      target.scrollIntoView({ behavior: "smooth" });
+      history.replaceState(null, "", selector);
     }));
   }
   function openModal(index) {
@@ -114,7 +103,7 @@
   function closeModal() { const modal = $("#project-modal"); if (modal) modal.hidden = true; }
   function initInteractions() {
     $$(".project-card").forEach((card) => { card.addEventListener("mouseenter", () => card.classList.add("hovered")); card.addEventListener("mouseleave", () => card.classList.remove("hovered")); $("button", card).addEventListener("click", () => openModal(Number(card.dataset.project))); });
-    $("#contact-form").addEventListener("submit", async (event) => { event.preventDefault(); const form = event.currentTarget, status = $("#form-status"), button = $("button", form); if (!form.reportValidity()) return; button.disabled = true; button.textContent = "Sending…"; try { const response = await fetch("https://formspree.io/f/xpwzljwd", { method:"POST", headers:{Accept:"application/json"}, body:new FormData(form) }); if (!response.ok) throw new Error(); form.reset(); status.textContent = "Message sent successfully. I will get back to you soon."; } catch { status.textContent = "Something went wrong. Please email me directly."; } finally { setTimeout(() => { button.disabled = false; button.innerHTML = "Send Message <span>↗</span>"; }, 1800); } });
+    $("#contact-form").addEventListener("submit", async (event) => { event.preventDefault(); const form = event.currentTarget, status = $("#form-status"), button = $("button", form); if (!form.reportValidity()) return; button.disabled = true; button.textContent = "Sending…"; try { const response = await fetch("https://formspree.io/f/xpwzljwd", { method:"POST", headers:{Accept:"json"}, body:new FormData(form) }); if (!response.ok) throw new Error(); form.reset(); status.textContent = "Message sent successfully. I will get back to you soon."; } catch { status.textContent = "Something went wrong. Please email me directly."; } finally { setTimeout(() => { button.disabled = false; button.innerHTML = "Send Message <span>↗</span>"; }, 1800); } });
   }
   function init() { renderSkills(); renderProjects(); renderProfiles(); renderContests(); initNavigation(); initSmoothLinks(); initCounters(); initReveal(); initInteractions(); $("[data-year]").textContent = new Date().getFullYear(); }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init, { once:true }) : init();
